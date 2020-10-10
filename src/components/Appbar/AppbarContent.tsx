@@ -69,10 +69,7 @@ class AppbarContent extends React.Component<Props> {
     } = this.props;
     const { fonts } = theme;
 
-    const subtitleColor = color(titleColor)
-      .alpha(0.7)
-      .rgb()
-      .string();
+    const subtitleColor = color(titleColor).alpha(0.7).rgb().string();
 
     return (
       <TouchableWithoutFeedback onPress={onPress}>

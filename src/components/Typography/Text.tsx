@@ -40,7 +40,7 @@ class Text extends React.Component<Props> {
     return (
       <NativeText
         {...rest}
-        ref={c => {
+        ref={(c) => {
           this._root = c;
         }}
         style={[

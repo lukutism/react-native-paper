@@ -158,10 +158,7 @@ class ProgressBar extends React.Component<Props, State> {
     const { color, indeterminate, style, theme } = this.props;
     const { fade, timer, width } = this.state;
     const tintColor = color || theme.colors.primary;
-    const trackTintColor = setColor(tintColor)
-      .alpha(0.38)
-      .rgb()
-      .string();
+    const trackTintColor = setColor(tintColor).alpha(0.38).rgb().string();
 
     return (
       <View onLayout={this._onLayout}>

@@ -170,7 +170,7 @@ class Menu extends React.Component<Props, State> {
   _menu?: View | null = null;
 
   _measureMenuLayout = () =>
-    new Promise<LayoutRectangle>(resolve => {
+    new Promise<LayoutRectangle>((resolve) => {
       if (this._menu) {
         this._menu.measureInWindow((x, y, width, height) => {
           resolve({ x, y, width, height });
@@ -179,7 +179,7 @@ class Menu extends React.Component<Props, State> {
     });
 
   _measureAnchorLayout = () =>
-    new Promise<LayoutRectangle>(resolve => {
+    new Promise<LayoutRectangle>((resolve) => {
       if (this._anchor) {
         this._anchor.measureInWindow((x, y, width, height) => {
           resolve({ x, y, width, height });
@@ -322,7 +322,7 @@ class Menu extends React.Component<Props, State> {
       duration: ANIMATION_DURATION * animation.scale,
       easing: EASING,
       useNativeDriver: true,
-    }).start(finished => {
+    }).start((finished) => {
       if (finished) {
         this._focusFirstDOMNode(this._anchor);
 
@@ -462,7 +462,7 @@ class Menu extends React.Component<Props, State> {
 
     return (
       <View
-        ref={ref => {
+        ref={(ref) => {
           this._anchor = ref;
         }}
         collapsable={false}
@@ -474,7 +474,7 @@ class Menu extends React.Component<Props, State> {
               <View style={StyleSheet.absoluteFill} />
             </TouchableWithoutFeedback>
             <View
-              ref={ref => {
+              ref={(ref) => {
                 this._menu = ref;
               }}
               collapsable={false}

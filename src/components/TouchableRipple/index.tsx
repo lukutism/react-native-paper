@@ -201,7 +201,7 @@ class TouchableRipple extends React.Component<Props> {
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        containers.forEach(container => {
+        containers.forEach((container) => {
           // @ts-ignore
           const ripple = container.firstChild;
 

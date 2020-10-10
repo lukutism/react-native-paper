@@ -128,7 +128,7 @@ class RadioButton extends React.Component<Props> {
 
     return (
       <RadioButtonContext.Consumer>
-        {context => (
+        {(context) => (
           <Button
             {...this.props}
             status={this.props.status || (context && this.isChecked(context))}

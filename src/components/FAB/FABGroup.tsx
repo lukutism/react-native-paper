@@ -162,7 +162,7 @@ class FABGroup extends React.Component<Props, State> {
         Animated.stagger(
           50,
           this.state.animations
-            .map(animation =>
+            .map((animation) =>
               Animated.timing(animation, {
                 toValue: 1,
                 duration: 150,
@@ -179,7 +179,7 @@ class FABGroup extends React.Component<Props, State> {
           duration: 200,
           useNativeDriver: true,
         }),
-        ...this.state.animations.map(animation =>
+        ...this.state.animations.map((animation) =>
           Animated.timing(animation, {
             toValue: 0,
             duration: 150,
@@ -210,10 +210,7 @@ class FABGroup extends React.Component<Props, State> {
 
     const labelColor = theme.dark
       ? colors.text
-      : color(colors.text)
-          .fade(0.54)
-          .rgb()
-          .string();
+      : color(colors.text).fade(0.54).rgb().string();
     const backdropOpacity = open
       ? this.state.backdrop.interpolate({
           inputRange: [0, 0.5, 1],
@@ -222,7 +219,7 @@ class FABGroup extends React.Component<Props, State> {
       : this.state.backdrop;
 
     const opacities = this.state.animations;
-    const scales = opacities.map(opacity =>
+    const scales = opacities.map((opacity) =>
       open
         ? opacity.interpolate({
             inputRange: [0, 1],

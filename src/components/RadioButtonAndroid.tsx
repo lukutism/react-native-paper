@@ -103,16 +103,10 @@ class RadioButtonAndroid extends React.Component<Props, State> {
     const checked = this.props.status === 'checked';
 
     if (disabled) {
-      rippleColor = color(theme.colors.text)
-        .alpha(0.16)
-        .rgb()
-        .string();
+      rippleColor = color(theme.colors.text).alpha(0.16).rgb().string();
       radioColor = theme.colors.disabled;
     } else {
-      rippleColor = color(checkedColor)
-        .fade(0.32)
-        .rgb()
-        .string();
+      rippleColor = color(checkedColor).fade(0.32).rgb().string();
       radioColor = checked ? checkedColor : uncheckedColor;
     }
 

@@ -56,6 +56,7 @@ try {
           {...rest}
           style={[styles.icon, { color, fontSize: size }]}
           pointerEvents="none"
+          selectable={false}
         >
           □
         </Text>

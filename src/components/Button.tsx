@@ -209,10 +209,7 @@ class Button extends React.Component<Props, State> {
       textColor = colors.primary;
     }
 
-    const rippleColor = color(textColor)
-      .alpha(0.32)
-      .rgb()
-      .string();
+    const rippleColor = color(textColor).alpha(0.32).rgb().string();
     const buttonStyle = {
       backgroundColor,
       borderColor,
@@ -271,8 +268,9 @@ class Button extends React.Component<Props, State> {
                 textStyle,
                 font,
               ]}
+              selectable={false}
             >
-              {React.Children.map(children, child =>
+              {React.Children.map(children, (child) =>
                 typeof child === 'string' && uppercase
                   ? child.toUpperCase()
                   : child

@@ -4,12 +4,11 @@ import color from 'color';
 import Icon from '../Icon';
 import { withTheme } from '../../core/theming';
 import { white } from '../../styles/colors';
-import { Theme } from '../../types';
-import { IconSource } from './../Icon';
+import type { IconSource } from './../Icon';
 
 const defaultSize = 64;
 
-type Props = {
+type Props = React.ComponentPropsWithRef<typeof View> & {
   /**
    * Icon to display for the `Avatar`.
    */
@@ -26,7 +25,7 @@ type Props = {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
 };
 
 /**
@@ -56,7 +55,7 @@ class Avatar extends React.Component<Props> {
   };
 
   render() {
-    const { icon, size = defaultSize, style, theme } = this.props;
+    const { icon, size = defaultSize, style, theme, ...rest } = this.props;
 
     const { backgroundColor = theme.colors.primary, ...restStyle } =
       StyleSheet.flatten(style) || {};
@@ -76,6 +75,7 @@ class Avatar extends React.Component<Props> {
           styles.container,
           restStyle,
         ]}
+        {...rest}
       >
         <Icon source={icon} color={textColor} size={size * 0.6} />
       </View>

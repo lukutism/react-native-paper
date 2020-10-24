@@ -15,7 +15,7 @@ import Text from '../Typography/Text';
 import { withTheme } from '../../core/theming';
 import { white } from '../../styles/colors';
 
-import { Theme, $RemoveChildren } from '../../types';
+import type { $RemoveChildren } from '../../types';
 
 type Props = $RemoveChildren<typeof View> & {
   /**
@@ -30,6 +30,10 @@ type Props = $RemoveChildren<typeof View> & {
    * Style for the title.
    */
   titleStyle?: StyleProp<TextStyle>;
+  /**
+   * Reference for the title.
+   */
+  titleRef?: React.RefObject<Text>;
   /**
    * Text for the subtitle.
    */
@@ -46,11 +50,31 @@ type Props = $RemoveChildren<typeof View> & {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
 };
 
 /**
- * A component used to display a title and optional subtitle in a appbar.
+ * A component used to display a title and optional subtitle in an appbar.
+ *
+ * <div class="screenshots">
+ *   <figure>
+ *     <img class="medium" src="screenshots/appbar-content.png" />
+ *   </figure>
+ * </div>
+ *
+ * ## Usage
+ * ```js
+ * import * as React from 'react';
+ * import { Appbar } from 'react-native-paper';
+ *
+ * const MyComponent = () => (
+ *     <Appbar.Header>
+ *        <Appbar.Content title="Title" subtitle={'Subtitle'} />
+ *     </Appbar.Header>
+ * );
+ *
+ * export default MyComponent;
+ * ```
  */
 class AppbarContent extends React.Component<Props> {
   static displayName = 'Appbar.Content';
@@ -62,6 +86,7 @@ class AppbarContent extends React.Component<Props> {
       subtitleStyle,
       onPress,
       style,
+      titleRef,
       titleStyle,
       theme,
       title,
@@ -69,15 +94,13 @@ class AppbarContent extends React.Component<Props> {
     } = this.props;
     const { fonts } = theme;
 
-    const subtitleColor = color(titleColor)
-      .alpha(0.7)
-      .rgb()
-      .string();
+    const subtitleColor = color(titleColor).alpha(0.7).rgb().string();
 
     return (
-      <TouchableWithoutFeedback onPress={onPress}>
+      <TouchableWithoutFeedback onPress={onPress} disabled={!onPress}>
         <View style={[styles.container, style]} {...rest}>
           <Text
+            ref={titleRef}
             style={[
               {
                 color: titleColor,
@@ -87,6 +110,7 @@ class AppbarContent extends React.Component<Props> {
               titleStyle,
             ]}
             numberOfLines={1}
+            accessible
             accessibilityTraits="header"
             // @ts-ignore
             accessibilityRole={Platform.OS === 'web' ? 'heading' : 'header'}

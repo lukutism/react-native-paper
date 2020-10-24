@@ -10,12 +10,18 @@ type Props = {
   /**
    * Color for the icon.
    */
-  color: string;
+  color?: string;
   style?: StyleProp<ViewStyle>;
 };
 
 /**
  * A component to show an icon in a list item.
+ *
+ * <div class="screenshots">
+ *   <figure>
+ *     <img class="medium" src="screenshots/list-icon.png" />
+ *   </figure>
+ * </div>
  *
  * ## Usage
  * ```js
@@ -24,6 +30,8 @@ type Props = {
  *
  * const MyComponent = () => (
  *   <List.Icon color={Colors.blue500} icon="folder" />
+ *   <List.Icon color={Colors.blue500} icon="equal" />
+ *   <List.Icon color={Colors.blue500} icon="calendar" />
  * );
  *
  * export default MyComponent;

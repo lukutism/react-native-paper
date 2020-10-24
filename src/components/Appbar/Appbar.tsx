@@ -13,19 +13,13 @@ import AppbarHeader, { AppbarHeader as _AppbarHeader } from './AppbarHeader';
 import Surface from '../Surface';
 import { withTheme } from '../../core/theming';
 import { black, white } from '../../styles/colors';
-import { Theme } from '../../types';
 import overlay from '../../styles/overlay';
 
-type Props = Partial<React.ComponentProps<typeof View>> & {
+type Props = Partial<React.ComponentPropsWithRef<typeof View>> & {
   /**
    * Whether the background color is a dark color. A dark appbar will render light text and vice-versa.
    */
   dark?: boolean;
-  /**
-   * Pass `true` if you want Appbar to use theme primary color even in dark mode.
-   * By default in dark mode Appbar use surface color.
-   */
-  primary?: boolean;
   /**
    * Content of the `Appbar`.
    */
@@ -33,7 +27,7 @@ type Props = Partial<React.ComponentProps<typeof View>> & {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -43,6 +37,9 @@ export const DEFAULT_APPBAR_HEIGHT = 56;
  * A component to display action items in a bar. It can be placed at the top or bottom.
  * The top bar usually contains the screen title, controls such as navigation buttons, menu button etc.
  * The bottom bar usually provides access to a drawer and up to four actions.
+ *
+ * By default Appbar uses primary color as a background, in dark theme with `adaptive` mode it will use surface colour instead.
+ * See [Dark Theme](https://callstack.github.io/react-native-paper/theming.html#dark-theme) for more informations
  *
  * <div class="screenshots">
  *   <img class="medium" src="screenshots/appbar.png" />
@@ -54,18 +51,22 @@ export const DEFAULT_APPBAR_HEIGHT = 56;
  * import { Appbar } from 'react-native-paper';
  * import { StyleSheet } from 'react-native';
  *
- * export default class MyComponent extends React.Component {
- *   render() {
- *     return (
- *       <Appbar style={styles.bottom}>
- *         <Appbar.Action icon="archive" onPress={() => console.log('Pressed archive')} />
- *         <Appbar.Action icon="mail" onPress={() => console.log('Pressed mail')} />
- *         <Appbar.Action icon="label" onPress={() => console.log('Pressed label')} />
- *         <Appbar.Action icon="delete" onPress={() => console.log('Pressed delete')} />
- *       </Appbar>
- *     );
- *   }
- * }
+ * const MyComponent = () => (
+ *  <Appbar style={styles.bottom}>
+ *    <Appbar.Action
+ *      icon="archive"
+ *      onPress={() => console.log('Pressed archive')}
+ *     />
+ *     <Appbar.Action icon="mail" onPress={() => console.log('Pressed mail')} />
+ *     <Appbar.Action icon="label" onPress={() => console.log('Pressed label')} />
+ *     <Appbar.Action
+ *       icon="delete"
+ *       onPress={() => console.log('Pressed delete')}
+ *     />
+ *   </Appbar>
+ *  );
+ *
+ * export default MyComponent
  *
  * const styles = StyleSheet.create({
  *   bottom: {
@@ -88,18 +89,22 @@ class Appbar extends React.Component<Props> {
   static Header = AppbarHeader;
 
   render() {
-    const { children, dark, style, theme, primary, ...rest } = this.props;
+    const { children, dark, style, theme, ...rest } = this.props;
 
-    const { colors, dark: isDarkTheme } = theme;
+    const { colors, dark: isDarkTheme, mode } = theme;
     const {
-      backgroundColor = isDarkTheme && !primary
-        ? overlay(4, colors.surface)
-        : colors.primary,
+      backgroundColor: customBackground,
+      elevation = 4,
       ...restStyle
-    } = StyleSheet.flatten(style) || {};
+    }: ViewStyle = StyleSheet.flatten(style) || {};
 
     let isDark: boolean;
 
+    const backgroundColor = customBackground
+      ? customBackground
+      : isDarkTheme && mode === 'adaptive'
+      ? overlay(elevation, colors.surface)
+      : colors.primary;
     if (typeof dark === 'boolean') {
       isDark = dark;
     } else {
@@ -117,7 +122,7 @@ class Appbar extends React.Component<Props> {
       let leftItemsCount = 0;
       let rightItemsCount = 0;
 
-      React.Children.forEach(children, child => {
+      React.Children.forEach(children, (child) => {
         if (React.isValidElement(child)) {
           if (child.type === AppbarContent) {
             hasAppbarContent = true;
@@ -130,18 +135,19 @@ class Appbar extends React.Component<Props> {
       });
 
       shouldCenterContent =
-        hasAppbarContent && (leftItemsCount < 2 && rightItemsCount < 2);
+        hasAppbarContent && leftItemsCount < 2 && rightItemsCount < 2;
       shouldAddLeftSpacing = shouldCenterContent && leftItemsCount === 0;
       shouldAddRightSpacing = shouldCenterContent && rightItemsCount === 0;
     }
     return (
       <Surface
-        style={[{ backgroundColor }, styles.appbar, restStyle]}
+        //@ts-ignore
+        style={[{ backgroundColor }, styles.appbar, { elevation }, restStyle]}
         {...rest}
       >
         {shouldAddLeftSpacing ? <View style={styles.spacing} /> : null}
         {React.Children.toArray(children)
-          .filter(child => child != null && typeof child !== 'boolean')
+          .filter((child) => child != null && typeof child !== 'boolean')
           .map((child, i) => {
             if (
               !React.isValidElement(child) ||

@@ -12,11 +12,18 @@ import color from 'color';
 import IconButton from './IconButton';
 import Surface from './Surface';
 import { withTheme } from '../core/theming';
-import { Theme } from '../types';
-import { IconSource } from './Icon';
+import type { IconSource } from './Icon';
 import MaterialCommunityIcon from './MaterialCommunityIcon';
 
-type Props = React.ComponentProps<typeof TextInput> & {
+type Props = React.ComponentPropsWithRef<typeof TextInput> & {
+  /**
+   * Accessibility label for the button. This is read by the screen reader when the user taps the button.
+   */
+  clearAccessibilityLabel?: string;
+  /**
+   * Accessibility label for the button. This is read by the screen reader when the user taps the button.
+   */
+  searchAccessibilityLabel?: string;
   /**
    * Hint text shown when the input is empty.
    */
@@ -46,7 +53,7 @@ type Props = React.ComponentProps<typeof TextInput> & {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
   /**
    * Custom color for icon, default will be derived from theme
    */
@@ -69,77 +76,83 @@ type Props = React.ComponentProps<typeof TextInput> & {
  * import * as React from 'react';
  * import { Searchbar } from 'react-native-paper';
  *
- * export default class MyComponent extends React.Component {
- *   state = {
- *     firstQuery: '',
- *   };
+ * const MyComponent = () => {
+ *   const [searchQuery, setSearchQuery] = React.useState('');
  *
- *   render() {
- *     const { firstQuery } = this.state;
- *     return (
- *       <Searchbar
- *         placeholder="Search"
- *         onChangeText={query => { this.setState({ firstQuery: query }); }}
- *         value={firstQuery}
- *       />
- *     );
- *   }
- * }
+ *   const onChangeSearch = query => setSearchQuery(query);
+ *
+ *   return (
+ *     <Searchbar
+ *       placeholder="Search"
+ *       onChangeText={onChangeSearch}
+ *       value={searchQuery}
+ *     />
+ *   );
+ * };
+ *
+ * export default MyComponent;
+
  * ```
  */
 class Searchbar extends React.Component<Props> {
-  _handleClearPress = () => {
+  static defaultProps = {
+    searchAccessibilityLabel: 'search',
+    clearAccessibilityLabel: 'clear',
+  };
+  private handleClearPress = () => {
     this.clear();
     this.props.onChangeText && this.props.onChangeText('');
   };
 
-  _root: TextInput | undefined | null;
+  private root: TextInput | undefined | null;
 
   /**
    * @internal
    */ setNativeProps(args: Object) {
-    return this._root && this._root.setNativeProps(args);
+    return this.root && this.root.setNativeProps(args);
   }
 
   /**
    * Returns `true` if the input is currently focused, `false` otherwise.
    */
   isFocused() {
-    return this._root && this._root.isFocused();
+    return this.root && this.root.isFocused();
   }
 
   /**
    * Removes all text from the TextInput.
    */
   clear() {
-    return this._root && this._root.clear();
+    return this.root && this.root.clear();
   }
 
   /**
    * Focuses the input.
    */
   focus() {
-    return this._root && this._root.focus();
+    return this.root && this.root.focus();
   }
 
   /**
    * Removes focus from the input.
    */
   blur() {
-    return this._root && this._root.blur();
+    return this.root && this.root.blur();
   }
 
   render() {
     const {
-      placeholder,
-      onIconPress,
-      icon,
-      value,
-      theme,
-      style,
-      iconColor: customIconColor,
+      clearAccessibilityLabel,
       clearIcon,
+      icon,
+      iconColor: customIconColor,
       inputStyle,
+      onIconPress,
+      placeholder,
+      searchAccessibilityLabel,
+      style,
+      theme,
+      value,
       ...rest
     } = this.props;
     const { colors, roundness, dark, fonts } = theme;
@@ -147,16 +160,8 @@ class Searchbar extends React.Component<Props> {
     const font = fonts.regular;
     const iconColor =
       customIconColor ||
-      (dark
-        ? textColor
-        : color(textColor)
-            .alpha(0.54)
-            .rgb()
-            .string());
-    const rippleColor = color(textColor)
-      .alpha(0.32)
-      .rgb()
-      .string();
+      (dark ? textColor : color(textColor).alpha(0.54).rgb().string());
+    const rippleColor = color(textColor).alpha(0.32).rgb().string();
 
     return (
       <Surface
@@ -167,6 +172,9 @@ class Searchbar extends React.Component<Props> {
         ]}
       >
         <IconButton
+          accessibilityTraits="button"
+          accessibilityComponentType="button"
+          accessibilityRole="button"
           borderless
           rippleColor={rippleColor}
           onPress={onIconPress}
@@ -182,6 +190,7 @@ class Searchbar extends React.Component<Props> {
               />
             ))
           }
+          accessibilityLabel={searchAccessibilityLabel}
         />
         <TextInput
           style={[styles.input, { color: textColor, ...font }, inputStyle]}
@@ -193,8 +202,8 @@ class Searchbar extends React.Component<Props> {
           keyboardAppearance={dark ? 'dark' : 'light'}
           accessibilityTraits="search"
           accessibilityRole="search"
-          ref={c => {
-            this._root = c;
+          ref={(c) => {
+            this.root = c;
           }}
           value={value}
           {...rest}
@@ -202,9 +211,10 @@ class Searchbar extends React.Component<Props> {
         <IconButton
           borderless
           disabled={!value}
+          accessibilityLabel={clearAccessibilityLabel}
           color={value ? iconColor : 'rgba(255, 255, 255, 0)'}
           rippleColor={rippleColor}
-          onPress={this._handleClearPress}
+          onPress={this.handleClearPress}
           icon={
             clearIcon ||
             (({ size, color }) => (

@@ -3,6 +3,9 @@ import renderer from 'react-test-renderer';
 import Button from '../Button.tsx';
 import { pink500 } from '../../styles/colors.tsx';
 
+jest.useFakeTimers();
+jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
+
 it('renders text button by default', () => {
   const tree = renderer.create(<Button>Text Button</Button>).toJSON();
 
@@ -60,6 +63,14 @@ it('renders disabled button', () => {
 it('renders button with color', () => {
   const tree = renderer
     .create(<Button color={pink500}>Custom Button</Button>)
+    .toJSON();
+
+  expect(tree).toMatchSnapshot();
+});
+
+it('renders button with custom testID', () => {
+  const tree = renderer
+    .create(<Button testID={'custom:testID'}>Button with custom testID</Button>)
     .toJSON();
 
   expect(tree).toMatchSnapshot();

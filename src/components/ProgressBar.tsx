@@ -7,12 +7,12 @@ import {
   ViewStyle,
   StyleProp,
   LayoutChangeEvent,
+  I18nManager,
 } from 'react-native';
 import setColor from 'color';
 import { withTheme } from '../core/theming';
-import { Theme } from '../types';
 
-type Props = {
+type Props = React.ComponentPropsWithRef<typeof View> & {
   /**
    * Progress value (between 0 and 1).
    */
@@ -33,7 +33,7 @@ type Props = {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
 };
 
 type State = {
@@ -44,6 +44,7 @@ type State = {
 
 const INDETERMINATE_DURATION = 2000;
 const INDETERMINATE_MAX_WIDTH = 0.6;
+const { isRTL } = I18nManager;
 
 /**
  * Progress bar is an indicator used to present progress of some activity in the app.
@@ -78,35 +79,43 @@ class ProgressBar extends React.Component<Props, State> {
 
   indeterminateAnimation: Animated.CompositeAnimation | null = null;
 
-  componentDidUpdate() {
-    const { visible } = this.props;
+  componentDidUpdate(prevProps: Props) {
+    const { visible, progress } = this.props;
 
-    if (visible) {
-      this._startAnimation();
-    } else {
-      this._stopAnimation();
+    if (progress !== prevProps.progress || visible !== prevProps.visible) {
+      if (visible) {
+        this.startAnimation();
+      } else {
+        this.stopAnimation();
+      }
     }
   }
 
-  _onLayout = (event: LayoutChangeEvent) => {
+  private onLayout = (event: LayoutChangeEvent) => {
     const { visible } = this.props;
     const { width: previousWidth } = this.state;
 
     this.setState({ width: event.nativeEvent.layout.width }, () => {
       // Start animation the very first time when previously the width was unclear
       if (visible && previousWidth === 0) {
-        this._startAnimation();
+        this.startAnimation();
       }
     });
   };
 
-  _startAnimation() {
-    const { indeterminate, progress } = this.props;
+  private startAnimation = () => {
+    const {
+      indeterminate,
+      progress,
+      theme: {
+        animation: { scale },
+      },
+    } = this.props;
     const { fade, timer } = this.state;
 
     // Show progress bar
     Animated.timing(fade, {
-      duration: 200,
+      duration: 200 * scale,
       toValue: 1,
       useNativeDriver: true,
       isInteraction: false,
@@ -130,16 +139,17 @@ class ProgressBar extends React.Component<Props, State> {
       Animated.loop(this.indeterminateAnimation).start();
     } else {
       Animated.timing(timer, {
-        duration: 200,
+        duration: 200 * scale,
         toValue: progress ? progress : 0,
         useNativeDriver: true,
         isInteraction: false,
       }).start();
     }
-  }
+  };
 
-  _stopAnimation() {
+  private stopAnimation = () => {
     const { fade } = this.state;
+    const { scale } = this.props.theme.animation;
 
     // Stop indeterminate animation
     if (this.indeterminateAnimation) {
@@ -147,24 +157,31 @@ class ProgressBar extends React.Component<Props, State> {
     }
 
     Animated.timing(fade, {
-      duration: 200,
+      duration: 200 * scale,
       toValue: 0,
       useNativeDriver: true,
       isInteraction: false,
     }).start();
-  }
+  };
 
   render() {
-    const { color, indeterminate, style, theme } = this.props;
+    const {
+      color,
+      indeterminate,
+      style,
+      theme,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      progress,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      visible,
+      ...rest
+    } = this.props;
     const { fade, timer, width } = this.state;
     const tintColor = color || theme.colors.primary;
-    const trackTintColor = setColor(tintColor)
-      .alpha(0.38)
-      .rgb()
-      .string();
+    const trackTintColor = setColor(tintColor).alpha(0.38).rgb().string();
 
     return (
-      <View onLayout={this._onLayout}>
+      <View onLayout={this.onLayout} {...rest}>
         <Animated.View
           style={[
             styles.container,
@@ -185,14 +202,17 @@ class ProgressBar extends React.Component<Props, State> {
                         ? {
                             inputRange: [0, 0.5, 1],
                             outputRange: [
-                              -0.5 * width,
-                              -0.5 * INDETERMINATE_MAX_WIDTH * width,
-                              0.7 * width,
+                              (isRTL ? 1 : -1) * 0.5 * width,
+                              (isRTL ? 1 : -1) *
+                                0.5 *
+                                INDETERMINATE_MAX_WIDTH *
+                                width,
+                              (isRTL ? -1 : 1) * 0.7 * width,
                             ],
                           }
                         : {
                             inputRange: [0, 1],
-                            outputRange: [-0.5 * width, 0],
+                            outputRange: [(isRTL ? 1 : -1) * 0.5 * width, 0],
                           }
                     ),
                   },

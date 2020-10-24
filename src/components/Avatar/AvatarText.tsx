@@ -6,15 +6,14 @@ import {
   StyleProp,
   TextStyle,
 } from 'react-native';
-import color from 'color';
+import Color from 'color';
 import Text from '../Typography/Text';
 import { withTheme } from '../../core/theming';
 import { white } from '../../styles/colors';
-import { Theme } from '../../types';
 
 const defaultSize = 64;
 
-type Props = {
+type Props = React.ComponentPropsWithRef<typeof View> & {
   /**
    * Initials to show as the text in the `Avatar`.
    */
@@ -38,7 +37,7 @@ type Props = {
   /**
    * @optional
    */
-  theme: Theme;
+  theme: ReactNativePaper.Theme;
 };
 
 /**
@@ -68,13 +67,21 @@ class AvatarText extends React.Component<Props> {
   };
 
   render() {
-    const { label, size = defaultSize, style, theme, labelStyle } = this.props;
+    const {
+      label,
+      size = defaultSize,
+      style,
+      theme,
+      labelStyle,
+      color,
+      ...rest
+    } = this.props;
 
     const { backgroundColor = theme.colors.primary, ...restStyle } =
       StyleSheet.flatten(style) || {};
     const textColor =
-      this.props.color ||
-      (color(backgroundColor).isLight() ? 'rgba(0, 0, 0, .54)' : white);
+      color ||
+      (Color(backgroundColor).isLight() ? 'rgba(0, 0, 0, .54)' : white);
 
     return (
       <View
@@ -88,6 +95,7 @@ class AvatarText extends React.Component<Props> {
           styles.container,
           restStyle,
         ]}
+        {...rest}
       >
         <Text
           style={[

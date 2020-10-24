@@ -38,9 +38,7 @@
     "test": "jest",
     "prepare": "bob build && node ./scripts/generate-mappings.js",
     "release": "release-it",
-    "bootstrap": "yarn --cwd example && yarn --cwd docs && yarn",
-    "docs": "yarn --cwd docs",
-    "example": "yarn --cwd example"
+    "docs": "yarn --cwd docs"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
